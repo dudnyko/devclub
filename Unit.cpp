@@ -7,7 +7,19 @@
 
 #include <iostream>
 
-class UnitIsDeadException {};
+class UnitIsDeadException {
+private:
+    std::string message;
+
+public:
+    UnitIsDeadException(std::string unitName) {
+        this->message = unitName + " is dead";
+    };
+
+    std::string getMessage() {
+        return message;
+    }
+};
 
 class Unit {
 private:
@@ -18,7 +30,26 @@ private:
 
 public:
     Unit(const std::string& title, int maxHP, int damage) {
-        // your code here :)
+        this->title = title;
+        this->maxHP = maxHP;
+        this->hp = maxHP;
+        this->damage = damage;
+    }
+
+    std::string getTitle() const {
+        return this->title;
+    }
+
+    int getHP() const {
+        return this->hp;
+    }
+
+    int getMaxHP() const {
+        return this->maxHP;
+    }
+
+    int getDamage() const {
+        return this->damage;
     }
 
     // your getters/setters here :)
@@ -31,16 +62,34 @@ public:
     // etc...
 
     void attack(Unit& enemy) {
-        // your code here :)
+        int healthRemain = enemy.getHP() - this->getDamage();
+
+        if (healthRemain > 0) {
+            enemy.hp = healthRemain;
+            counterAttack(enemy);
+        }
+        else {
+            UnitIsDeadException obj(enemy.getTitle());
+            throw obj;
+        }
     }
 
     void counterAttack(Unit& enemy) {
-        // your code here :)
+        int healthRemain = this->getHP() - enemy.getDamage() / 2;
+
+        if (healthRemain > 0) {
+            this->hp = healthRemain;
+        }
+        else {
+            UnitIsDeadException obj(this->getTitle());
+            throw obj;
+        }
     }
 };
 
 std::ostream& operator<<(std::ostream& out, const Unit& unit) {
-    // your code here :)
+    out << unit.getTitle() << ": hp(" << unit.getHP() << "/" << unit.getMaxHP() << "), dmg (" << unit.getDamage() << ")";
+    return out;
     // Output example: <Title>:: hp(<hp>/<maxHP>), dmg(<damage>)
 }
 
@@ -51,10 +100,40 @@ int main() {
     std::cout << knight << std::endl; // Knight:: hp(100/100), dmg(20)
     std::cout << barbarian << std::endl; // Barbarian:: hp(80/80), dmg(30)
 
-    knight.attack(barbarian);
+    try {
+        knight.attack(barbarian);
 
-    std::cout << knight << std::endl; // Knight:: hp(85/100), dmg(20)
-    std::cout << barbarian << std::endl; // Barbarian:: hp(60/80), dmg(30)
+        std::cout << knight << std::endl; // Knight:: hp(85/100), dmg(20)
+        std::cout << barbarian << std::endl; // Barbarian:: hp(60/80), dmg(30)
 
+        knight.attack(barbarian);
+
+        std::cout << knight << std::endl; // Knight:: hp(85/100), dmg(20)
+        std::cout << barbarian << std::endl; // Barbarian:: hp(60/80), dmg(30)
+
+        knight.attack(barbarian);
+
+        std::cout << knight << std::endl; // Knight:: hp(85/100), dmg(20)
+        std::cout << barbarian << std::endl; // Barbarian:: hp(60/80), dmg(30)
+
+        barbarian.attack(knight);
+
+        std::cout << knight << std::endl; // Knight:: hp(85/100), dmg(20)
+        std::cout << barbarian << std::endl; // Barbarian:: hp(60/80), dmg(30)
+
+        barbarian.attack(knight);
+
+        std::cout << knight << std::endl; // Knight:: hp(85/100), dmg(20)
+        std::cout << barbarian << std::endl; // Barbarian:: hp(60/80), dmg(30)
+
+        barbarian.attack(knight);
+
+        std::cout << knight << std::endl; // Knight:: hp(85/100), dmg(20)
+        std::cout << barbarian << std::endl; // Barbarian:: hp(60/80), dmg(30)
+
+    }
+    catch (UnitIsDeadException obj) {
+        std::cout << obj.getMessage() << std::endl;
+    }
     return 0;
 }
