@@ -18,7 +18,7 @@ private:
     int year;
 
     void validate(int day, int month, int year) {
-        bool isLeap = (year % 4 == 0) && ((year % 100 != 0) || year % 400 == 0);  
+        bool isLeap = (year % 4 == 0) && ((year % 100 != 0) || year % 400 == 0);
         enum Months {
             Jan = 1,
             Feb, Mar, Apr, May, Jun, Jul, Aug, Sept, Oct, Nov, Dec
@@ -27,11 +27,11 @@ private:
         bool monthWith31Days = month == Jan || month == Mar || month == May || month == Jul || month == Aug || month == Oct || month == Dec;
         bool isFeb = month == Feb;
 
-       if (day <= 30 && monthWith30Days) return;
-       else if (day <= 31 && monthWith31Days) return;
-       else if (month == Feb && isLeap && day <= 29) return;
-       else if (month == Feb && !isLeap && day <= 28) return;
-       else throw InvalidDateException();
+        if (day <= 30 && monthWith30Days) return;
+        else if (day <= 31 && monthWith31Days) return;
+        else if (month == Feb && isLeap && day <= 29) return;
+        else if (month == Feb && !isLeap && day <= 28) return;
+        else throw InvalidDateException();
     }
 public:
     Date(int day = 1, int month = 1, int year = 1970) {
@@ -46,9 +46,15 @@ public:
     int getMonth() const { return this->month; }
     int getYear() const { return this->year; }
 
-    //int operator-(const date& other) const {
-    //    // your code here
-    //}
+    int calculateDays() const {
+        int days = 365 * this->year + (this->year / 4) - (this->year / 100) + (this->year / 400) + ((306 * (this->month + 1)) / 10) + this->day - 719468;
+        return days;
+    }
+
+    int operator-(const Date& other) const {
+        int days = this->calculateDays() - other.calculateDays();
+        return days;
+    }
 };
 
 std::ostream& operator<<(std::ostream& out, const Date& date) {
@@ -57,15 +63,15 @@ std::ostream& operator<<(std::ostream& out, const Date& date) {
 };
 
 
-int main(){
+int main() {
     Date start(24, 2, 2024);
     Date current(19, 9, 2024);
-    //int days = current - start;
+    int days = current - start;
 
 
     std::cout << start << std::endl; // 24.02.2024
     std::cout << current << std::endl; // 19.09.2024
-    //std::cout << days << std::endl; // 939
+    std::cout << days << std::endl; // 939
 
     return 0;
 }
